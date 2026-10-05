@@ -1,0 +1,99 @@
+# =============================================================================
+# .gitignore  -  O que o Git deve IGNORAR neste projeto Electron
+# =============================================================================
+# Regra pratica: so vai para o repositorio o que alguem precisa para rodar o
+# projeto do zero (codigo, package.json, package-lock.json, documentacao).
+# Tudo o que e gerado, baixado ou pessoal fica de fora.
+# Linhas que comecam com "#" sao comentarios.
+
+# -----------------------------------------------------------------------------
+# Dependencias
+# -----------------------------------------------------------------------------
+# Cada dev gera essa pasta rodando "npm install". Ela e enorme e pode conter
+# binarios especificos do sistema (Linux x Windows), entao nunca sobe.
+# IMPORTANTE: o package-lock.json NAO e ignorado. Ele garante que todo mundo
+# instale exatamente as mesmas versoes.
+node_modules/
+
+# -----------------------------------------------------------------------------
+# Saida de build e instaladores (electron-builder, Electron Forge, etc.)
+# -----------------------------------------------------------------------------
+dist/
+out/
+build/
+release/
+*.exe
+*.msi
+*.AppImage
+*.deb
+*.rpm
+*.dmg
+*.pkg
+*.snap
+
+# -----------------------------------------------------------------------------
+# Segredos e configuracao local
+# -----------------------------------------------------------------------------
+# Senhas do MySQL, chaves de API e afins NUNCA vao para o GitHub, mesmo em
+# repositorio privado. Cada dev cria o proprio .env a partir do .env.example,
+# que esse sim e versionado (a linha com "!" abaixo abre essa excecao).
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# -----------------------------------------------------------------------------
+# Banco de dados local
+# -----------------------------------------------------------------------------
+# Dados do MySQL rodando em container ou arquivos de banco locais.
+# Scripts de schema (.sql) devem ser versionados, entao NAO ignoramos *.sql.
+mysql-data/
+db-data/
+*.sqlite
+*.sqlite3
+*.db
+
+# -----------------------------------------------------------------------------
+# Logs e arquivos temporarios
+# -----------------------------------------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tmp
+*.temp
+.cache/
+.eslintcache
+coverage/
+*.tgz
+
+# -----------------------------------------------------------------------------
+# Editores e IDEs
+# -----------------------------------------------------------------------------
+# Ignoramos as configuracoes pessoais do VS Code, mas mantemos as que ajudam o
+# time todo: o launch.json (debug do Electron) e as extensoes recomendadas.
+.vscode/*
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# -----------------------------------------------------------------------------
+# Lixo gerado pelo sistema operacional
+# -----------------------------------------------------------------------------
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+# macOS
+.DS_Store
+# Linux
+.directory
+.Trash-*

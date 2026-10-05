@@ -1,0 +1,24 @@
+# =============================================================================
+# .gitattributes  -  Padroniza quebras de linha entre Windows e Linux
+# =============================================================================
+# O Windows usa CRLF e o Linux usa LF. Sem esta configuracao, um arquivo editado
+# no Windows pode aparecer inteiro como "modificado" no diff de quem usa Linux,
+# e o ESLint/Prettier podem reclamar de quebras de linha. Aqui definimos que
+# todo texto do repositorio usa LF.
+* text=auto eol=lf
+
+# Scripts do Windows precisam continuar com CRLF para funcionar direito.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Arquivos binarios: o Git nao deve tentar converter nem comparar como texto.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.icns binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
