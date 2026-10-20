@@ -53,3 +53,10 @@ contextBridge.exposeInMainWorld('versions', {
 //   tela chama window.api.users.list()
 //     -> preload faz ipcRenderer.invoke('users:list')
 //       -> main responde com ipcMain.handle('users:list', ...) consultando o MySQL
+
+
+// Aqui vamos expor a API de tarefas.
+tarefas: {
+  listar: (payload) => ipcRenderer.invoke('tarefas:listar', payload)
+}
+ 

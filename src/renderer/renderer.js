@@ -37,6 +37,9 @@ const func = async () => {
   console.log(response) // prints out 'pong'
 }
 
+const { registerTarefasHandlers } = require('./ipc/tarefas')
+registerTarefasHandlers()
+
 // Executa o teste assim que a pagina carrega. Se aparecer 'pong' no console do
 // DevTools, a comunicacao entre as duas pontas esta funcionando.
 func()
