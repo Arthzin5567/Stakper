@@ -56,7 +56,15 @@ contextBridge.exposeInMainWorld('versions', {
 
 
 // Aqui vamos expor a API de tarefas.
-tarefas: {
-  listar: (payload) => ipcRenderer.invoke('tarefas:listar', payload)
-}
- 
+// Mantido para compatibilidade com a estrutura atual do projeto.
+contextBridge.exposeInMainWorld('stakper', {
+  versions: {
+    node: () => process.versions.node,
+    chrome: () => process.versions.chrome,
+    electron: () => process.versions.electron
+  },
+  ping: () => ipcRenderer.invoke('ping'),
+  tarefas: {
+    listar: (payload) => ipcRenderer.invoke('tarefas:listar', payload)
+  }
+})

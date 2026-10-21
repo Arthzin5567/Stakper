@@ -1,21 +1,1041 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <meta
-      http-equiv="X-Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <title>Hello from Electron renderer!</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stakper</title>
+    <style>
+      :root {
+        --bg: #f4f6ff;
+        --bg-soft: #edf2ff;
+        --panel: rgba(255, 255, 255, 0.88);
+        --panel-strong: #ffffff;
+        --panel-soft: #eef3ff;
+        --primary: #5b6cff;
+        --primary-strong: #4053e6;
+        --secondary: #8b5cf6;
+        --text: #1d2340;
+        --muted: #6d7697;
+        --border: rgba(124, 138, 255, 0.17);
+        --success: #2bc48a;
+        --warning: #ffb648;
+        --danger: #f87171;
+        --shadow: 0 18px 50px rgba(91, 108, 255, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #eef3ff 0%, #f8f9ff 100%);
+        color: var(--text);
+      }
+
+      body.focus-mode {
+        background: #0f172a;
+        color: #edf3ff;
+      }
+
+      button, input, select {
+        font: inherit;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 250px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        background: rgba(17, 24, 39, 0.96);
+        color: #edf3ff;
+        padding: 28px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+
+      .brand-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--primary), #8aa2ff);
+        color: white;
+        font-weight: 800;
+      }
+
+      .nav {
+        display: grid;
+        gap: 12px;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 12px 14px;
+        color: #edf3ff;
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      .nav-item.active {
+        background: rgba(91, 108, 255, 0.2);
+        border-color: rgba(91, 108, 255, 0.45);
+      }
+
+      .nav-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        background: rgba(255,255,255,0.08);
+        font-size: 0.9rem;
+      }
+
+      .mini-card {
+        margin-top: auto;
+        background: linear-gradient(180deg, rgba(91,108,255,0.18), rgba(139,92,246,0.08));
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 18px;
+        padding: 18px 16px;
+      }
+
+      .mini-card .label {
+        color: rgba(237, 243, 255, 0.7);
+        font-size: 0.72rem;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .mini-card strong {
+        display: block;
+        font-size: 1.2rem;
+        margin-bottom: 8px;
+      }
+
+      .mini-card span {
+        font-size: 0.75rem;
+        color: rgba(237, 243, 255, 0.8);
+      }
+
+      .content {
+        padding: 24px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .pill {
+        padding: 10px 12px;
+        border-radius: 999px;
+        background: rgba(91, 108, 255, 0.08);
+        border: 1px solid rgba(91, 108, 255, 0.12);
+        color: var(--primary-strong);
+        font-weight: 700;
+        font-size: 0.76rem;
+      }
+
+      .focus-button {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 18px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 10px 24px rgba(91, 108, 255, 0.22);
+      }
+
+      .timer-actions {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+        justify-content: center;
+      }
+
+      .timer-stop {
+        background: rgba(248, 113, 113, 0.12);
+        color: #b42318;
+        border: 1px solid rgba(248, 113, 113, 0.2);
+        border-radius: 12px;
+        padding: 12px 18px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(237,242,255,0.9));
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 24px 28px;
+        box-shadow: var(--shadow);
+        margin-bottom: 20px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: clamp(2rem, 2vw, 2.8rem);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+        gap: 18px;
+        margin-bottom: 22px;
+      }
+
+      .stat-card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 18px 20px;
+        box-shadow: var(--shadow);
+      }
+
+      .stat-label {
+        color: var(--muted);
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+      }
+
+      .stat-value {
+        font-weight: 800;
+        font-size: 2rem;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1.45fr 0.95fr;
+        gap: 22px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 22px;
+        box-shadow: var(--shadow);
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+
+      .panel-header h3 {
+        margin: 0;
+        font-size: 1.08rem;
+      }
+
+      .panel-link {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.8rem;
+      }
+
+      .task-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 12px;
+      }
+
+      .task-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background: var(--panel-soft);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 12px 14px;
+      }
+
+      .task-item.done {
+        opacity: 0.65;
+        text-decoration: line-through;
+      }
+
+      .task-item span {
+        font-weight: 600;
+      }
+
+      .task-done {
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        background: var(--success);
+        color: white;
+        cursor: pointer;
+      }
+
+      .task-form {
+        display: flex;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .task-form input {
+        flex: 1;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px 14px;
+        background: rgba(255,255,255,0.8);
+      }
+
+      .primary-button,
+      .timer-button,
+      .focus-action {
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .primary-button { padding: 12px 16px; }
+
+      .right-column {
+        display: grid;
+        gap: 22px;
+      }
+
+      .timer-box {
+        display: grid;
+        place-items: center;
+        text-align: center;
+        gap: 12px;
+        min-height: 240px;
+      }
+
+      .timer-display {
+        font-size: clamp(2.5rem, 4vw, 4rem);
+        font-weight: 800;
+      }
+
+      .timer-button {
+        padding: 12px 18px;
+      }
+
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+        margin-top: 18px;
+      }
+
+      .calendar-day {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 8px;
+        text-align: center;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--muted);
+      }
+
+      .calendar-day.active { background: rgba(91, 108, 255, 0.14); color: var(--primary); }
+      .calendar-day.focus { background: rgba(139, 92, 246, 0.12); color: var(--secondary); }
+      .calendar-day.rest { background: rgba(255, 182, 72, 0.12); color: #b76d00; }
+
+      .schedule-list {
+        list-style: none;
+        margin: 18px 0 0;
+        padding: 0;
+        display: grid;
+        gap: 12px;
+      }
+
+      .schedule-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(91, 108, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+
+      .schedule-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--primary);
+      }
+
+      .schedule-item strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .muted {
+        color: var(--muted);
+        font-size: 0.75rem;
+      }
+
+      .view {
+        display: none;
+      }
+
+      .view.active {
+        display: block;
+      }
+
+      .welcome-grid,
+      .auth-grid,
+      .profile-grid,
+      .kanban-grid {
+        display: grid;
+        gap: 22px;
+      }
+
+      .welcome-grid {
+        grid-template-columns: 1.3fr 0.7fr;
+      }
+
+      .auth-grid {
+        grid-template-columns: repeat(2, minmax(260px, 1fr));
+      }
+
+      .profile-grid {
+        grid-template-columns: 0.9fr 1.1fr;
+      }
+
+      .kanban-grid {
+        grid-template-columns: repeat(3, minmax(220px, 1fr));
+      }
+
+      .welcome-hero,
+      .auth-card,
+      .profile-card,
+      .table-panel,
+      .kanban-column {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 22px;
+        box-shadow: var(--shadow);
+      }
+
+      .welcome-hero h2 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 2vw, 3rem);
+      }
+
+      .welcome-hero p {
+        margin: 0 0 20px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .welcome-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .field label {
+        font-weight: 700;
+        font-size: 0.82rem;
+      }
+
+      .field input,
+      .field select,
+      .filters input,
+      .filters select {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px 14px;
+        background: rgba(255,255,255,0.8);
+      }
+
+      .auth-card h3,
+      .profile-card h3 {
+        margin-top: 0;
+      }
+
+      .avatar {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        display: grid;
+        place-items: center;
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 16px;
+      }
+
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+
+      .filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th, td {
+        padding: 12px 10px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+
+      th {
+        color: var(--muted);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        background: rgba(91,108,255,0.1);
+        color: var(--primary-strong);
+        text-transform: capitalize;
+      }
+
+      .badge.alta { background: rgba(248,113,113,0.12); color: #b42318; }
+      .badge.media { background: rgba(255,182,72,0.12); color: #a56200; }
+      .badge.baixa { background: rgba(43,196,138,0.12); color: #0b7a52; }
+
+      .status-tag {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: capitalize;
+      }
+
+      .status-pendente { background: rgba(255,182,72,0.12); color: #a56200; }
+      .status-em-andamento { background: rgba(91,108,255,0.12); color: var(--primary-strong); }
+      .status-concluida { background: rgba(43,196,138,0.12); color: #0b7a52; }
+
+      .row-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .mini-btn {
+        padding: 7px 10px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      .mini-btn.edit { background: rgba(91,108,255,0.12); color: var(--primary-strong); }
+      .mini-btn.delete { background: rgba(248,113,113,0.12); color: #b42318; }
+
+      .kanban-column {
+        min-height: 400px;
+      }
+
+      .kanban-column h4 {
+        margin: 0 0 16px;
+      }
+
+      .kanban-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .kanban-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 12px;
+      }
+
+      .kanban-card strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .meta-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+
+      .focus-panel {
+        display: grid;
+        gap: 16px;
+      }
+
+      .focus-options {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .focus-option {
+        border: 1px solid var(--border);
+        background: rgba(91, 108, 255, 0.04);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 9px 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .focus-option.is-active {
+        background: rgba(91, 108, 255, 0.14);
+        border-color: rgba(91, 108, 255, 0.30);
+        color: var(--primary-strong);
+      }
+
+      .focus-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(91, 108, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 14px 16px;
+      }
+
+      .focus-meta strong {
+        display: block;
+        font-size: 1.1rem;
+      }
+
+      .focus-action {
+        padding: 12px 18px;
+      }
+
+      .focus-breaks {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .focus-break {
+        flex: 1;
+        background: rgba(255, 182, 72, 0.08);
+        border: 1px solid rgba(255, 182, 72, 0.24);
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-weight: 700;
+        color: #a56200;
+      }
+
+      body.focus-mode .panel,
+      body.focus-mode .stat-card,
+      body.focus-mode .hero,
+      body.focus-mode .sidebar .mini-card {
+        background: rgba(15, 23, 42, 0.82);
+        border-color: rgba(148, 163, 184, 0.3);
+        color: #edf3ff;
+      }
+
+      body.focus-mode .task-item,
+      body.focus-mode .schedule-item,
+      body.focus-mode .focus-meta {
+        background: rgba(91, 108, 255, 0.12);
+      }
+
+      body.focus-mode .pill,
+      body.focus-mode .nav-item,
+      body.focus-mode .focus-option {
+        background: rgba(148, 163, 184, 0.08);
+        color: #edf3ff;
+      }
+    </style>
   </head>
   <body>
-    <h1>Hello from Electron renderer!</h1>
-    <p>👋</p>
-    <p id="info"></p>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand-wrap">
+          <div class="brand-mark">S</div>
+          <span>Stakper</span>
+        </div>
+
+        <nav class="nav" aria-label="Menu principal">
+          <button class="nav-item active" data-view="home" type="button"><span class="nav-icon">⌂</span> Home</button>
+          <button class="nav-item" data-view="profile" type="button"><span class="nav-icon">◉</span> Perfil</button>
+          <button class="nav-item" data-view="tasks" type="button"><span class="nav-icon">✓</span> Tarefas</button>
+          <button class="nav-item" data-view="kanban" type="button"><span class="nav-icon">▦</span> Kanban</button>
+        </nav>
+
+        <div class="mini-card">
+          <div class="label">Progresso</div>
+          <strong>78%</strong>
+          <span>Meta semanal quase concluída</span>
+        </div>
+      </aside>
+
+      <main class="content">
+        <header class="topbar">
+          <div class="pill">Semana 42</div>
+          <div class="topbar-right">
+            <div class="pill" id="user-pill">Ana · estudante</div>
+            <button id="focus-button" class="focus-button" type="button">Ativar modo foco</button>
+          </div>
+        </header>
+
+        <section id="view-home" class="view active">
+          <div class="hero">
+            <div>
+              <p class="eyebrow">Resumo da rotina</p>
+              <h1>Organize seu dia sem perder foco</h1>
+            </div>
+            <div class="pill">Acompanhe o ritmo do estudo</div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Tarefas pendentes</div>
+              <div class="stat-value" data-stat="tasks">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Sequência de foco</div>
+              <div class="stat-value" data-stat="focus">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Horas de estudo</div>
+              <div class="stat-value" data-stat="study">0</div>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="left-column">
+              <div class="panel">
+                <div class="panel-header">
+                  <h3>Tarefas pendentes</h3>
+                  <button class="panel-link" type="button" data-view="tasks">Ver todas</button>
+                </div>
+
+                <ul id="task-list" class="task-list"></ul>
+              </div>
+
+              <div class="panel" style="margin-top: 22px;">
+                <div class="panel-header">
+                  <h3>Agenda de hoje</h3>
+                </div>
+
+                <ul class="schedule-list">
+                  <li class="schedule-item">
+                    <span class="schedule-dot"></span>
+                    <div>
+                      <strong>Estudo de cálculo</strong>
+                      <span class="muted">09:00 - 10:30</span>
+                    </div>
+                  </li>
+                  <li class="schedule-item">
+                    <span class="schedule-dot" style="background: var(--secondary);"></span>
+                    <div>
+                      <strong>Leitura de literatura</strong>
+                      <span class="muted">11:00 - 12:00</span>
+                    </div>
+                  </li>
+                  <li class="schedule-item">
+                    <span class="schedule-dot" style="background: var(--success);"></span>
+                    <div>
+                      <strong>Revisão de biologia</strong>
+                      <span class="muted">14:00 - 15:00</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <aside class="right-column">
+              <section class="panel timer-box">
+                <h3>Temporizador</h3>
+                <div id="timer-display" class="timer-display">25:00</div>
+                <div class="timer-actions">
+                  <button id="timer-button" class="timer-button" type="button">Iniciar</button>
+                  <button id="timer-stop" class="timer-stop" type="button">Encerrar</button>
+                </div>
+                <p id="info" class="muted"></p>
+              </section>
+
+              <section class="panel focus-panel">
+                <div class="panel-header">
+                  <h3>Modo foco</h3>
+                </div>
+
+                <div class="focus-options">
+                  <button class="focus-option is-active" data-focus="25" type="button">25 min</button>
+                  <button class="focus-option" data-focus="50" type="button">50 min</button>
+                  <button class="focus-option" data-focus="90" type="button">90 min</button>
+                </div>
+
+                <div class="focus-meta">
+                  <div>
+                    <span class="muted">Sessão atual</span>
+                    <strong id="focus-session">25 min</strong>
+                  </div>
+                  <div>
+                    <span class="muted">Pausa</span>
+                    <strong id="break-session">5 min</strong>
+                  </div>
+                </div>
+
+                <div class="focus-breaks">
+                  <button class="focus-break" type="button">Pausa curta 5 min</button>
+                  <button class="focus-break" type="button">Pausa longa 15 min</button>
+                </div>
+
+                <div class="field">
+                  <label for="custom-focus">Tempo customizado</label>
+                  <input id="custom-focus" type="number" min="10" max="180" value="25" />
+                </div>
+                <div class="field">
+                  <label for="custom-break">Pausa customizada</label>
+                  <input id="custom-break" type="number" min="5" max="60" value="5" />
+                </div>
+                <button id="apply-focus" class="focus-action" type="button">Aplicar configuração</button>
+              </section>
+
+              <section class="panel">
+                <div class="panel-header">
+                  <h3>Calendário</h3>
+                </div>
+                <div id="calendar-days" class="calendar-grid"></div>
+              </section>
+
+              <section class="panel">
+                <div class="panel-header">
+                  <h3>Próximos prazos</h3>
+                </div>
+
+                <ul class="schedule-list">
+                  <li class="schedule-item">
+                    <span class="schedule-dot" style="background: var(--danger);"></span>
+                    <div>
+                      <strong>Trabalho de Física</strong>
+                      <span class="muted">Entrega em 2 dias</span>
+                    </div>
+                  </li>
+                  <li class="schedule-item">
+                    <span class="schedule-dot" style="background: var(--warning);"></span>
+                    <div>
+                      <strong>Mapa mental de Química</strong>
+                      <span class="muted">Entrega em 4 dias</span>
+                    </div>
+                  </li>
+                  <li class="schedule-item">
+                    <span class="schedule-dot" style="background: var(--success);"></span>
+                    <div>
+                      <strong>Leitura de Sociologia</strong>
+                      <span class="muted">Revisão em 1 semana</span>
+                    </div>
+                  </li>
+                </ul>
+              </section>
+            </aside>
+          </div>
+        </section>
+
+        <section id="view-auth" class="view active">
+          <div class="auth-grid" style="margin-top: 22px; max-width: 1000px;">
+            <form id="login-form" class="auth-card">
+              <h3>Login</h3>
+              <div class="field">
+                <label for="login-email">E-mail</label>
+                <input id="login-email" name="email" type="email" value="ana@stakper.com" required />
+              </div>
+              <div class="field">
+                <label for="login-password">Senha</label>
+                <input id="login-password" name="password" type="password" value="123456" required />
+              </div>
+              <button class="primary-button" type="submit">Entrar</button>
+            </form>
+
+            <form id="register-form" class="auth-card">
+              <h3>Cadastro</h3>
+              <div class="field">
+                <label for="register-name">Nome</label>
+                <input id="register-name" name="name" type="text" value="Ana Silva" required />
+              </div>
+              <div class="field">
+                <label for="register-email">E-mail</label>
+                <input id="register-email" name="email" type="email" value="ana@stakper.com" required />
+              </div>
+              <div class="field">
+                <label for="register-course">Curso</label>
+                <input id="register-course" name="course" type="text" value="Engenharia de Software" required />
+              </div>
+              <button class="primary-button" type="submit">Criar conta</button>
+            </form>
+          </div>
+        </section>
+
+        <section id="view-profile" class="view">
+          <div class="profile-grid">
+            <div class="profile-card">
+              <div class="avatar">AS</div>
+              <h3 id="profile-name">Ana Silva</h3>
+              <p class="muted" id="profile-meta">Engenharia de Software · 3º semestre</p>
+              <div class="stat-card" style="margin-top: 16px; padding: 16px;">
+                <div class="stat-label">Meta geral</div>
+                <div class="stat-value">82%</div>
+              </div>
+            </div>
+
+            <form id="profile-form" class="profile-card">
+              <div class="panel-header">
+                <h3>Detalhes do perfil</h3>
+              </div>
+              <div class="field">
+                <label for="profile-name-input">Nome</label>
+                <input id="profile-name-input" name="name" type="text" value="Ana Silva" required />
+              </div>
+              <div class="field">
+                <label for="profile-course-input">Curso</label>
+                <input id="profile-course-input" name="course" type="text" value="Engenharia de Software" required />
+              </div>
+              <div class="field">
+                <label for="profile-objective-input">Objetivo semanal</label>
+                <input id="profile-objective-input" name="objective" type="text" value="Concluir 3 atividades prioritárias" required />
+              </div>
+              <button class="primary-button" type="submit">Salvar perfil</button>
+            </form>
+          </div>
+        </section>
+
+        <section id="view-tasks" class="view">
+          <div class="table-panel">
+            <div class="toolbar">
+              <div class="filters">
+                <input id="task-search" type="text" placeholder="Pesquisar tarefa..." />
+                <select id="task-status-filter">
+                  <option value="all">Todos os status</option>
+                  <option value="pendente">Pendente</option>
+                  <option value="em-andamento">Em andamento</option>
+                  <option value="concluida">Concluída</option>
+                </select>
+                <select id="task-folder-filter">
+                  <option value="all">Todas as pastas</option>
+                  <option value="universidade">Universidade</option>
+                  <option value="projeto">Projeto</option>
+                  <option value="pessoal">Pessoal</option>
+                </select>
+              </div>
+              <button class="primary-button" type="button" id="add-task-btn">Adicionar tarefa</button>
+            </div>
+
+            <div class="panel-header" style="margin-bottom: 12px;">
+              <h3>Pastas</h3>
+            </div>
+            <div id="folder-chips" class="focus-options" style="margin-bottom: 18px;"></div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Pasta</th>
+                  <th>Prioridade</th>
+                  <th>Status</th>
+                  <th>Prazo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="task-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="view-kanban" class="view">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Quadro Kanban</h3>
+              <button class="panel-link" type="button" data-view="tasks">Organizar por prioridade</button>
+            </div>
+
+            <div class="kanban-grid">
+              <div class="kanban-column">
+                <h4>À fazer</h4>
+                <div id="kanban-pendente" class="kanban-list"></div>
+              </div>
+              <div class="kanban-column">
+                <h4>Em andamento</h4>
+                <div id="kanban-em-andamento" class="kanban-list"></div>
+              </div>
+              <div class="kanban-column">
+                <h4>Concluído</h4>
+                <div id="kanban-concluida" class="kanban-list"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./renderer.js"></script>
   </body>
-  <script src="./renderer.js"></script>
 </html>
