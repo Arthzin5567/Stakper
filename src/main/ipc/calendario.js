@@ -5,6 +5,7 @@ const { handle, AppError } = require('./helpers')
 
 const TITULO_MAX = 150
 const DESCRICAO_MAX = 2000
+const DIAS_POR_ASSOCIACAO_MAX = 366
 const COLUNAS_EVENTO = `id_evento, id_usuario, titulo, descricao, data_inicio, data_fim`
 
 function toEvento(row) {
@@ -32,6 +33,14 @@ function validarIdEvento(valor) {
     throw new AppError('VALIDATION_ERROR', 'Id de evento inválido', { field: 'idEvento' })
   }
   return idEvento
+}
+
+function validarIdTarefa(valor) {
+  const idTarefa = Number(valor)
+  if (!Number.isInteger(idTarefa) || idTarefa <= 0) {
+    throw new AppError('VALIDATION_ERROR', 'Id de tarefa inválido', { field: 'idTarefa' })
+  }
+  return idTarefa
 }
 
 function validarTitulo(valor, obrigatorio = true) {
@@ -83,6 +92,30 @@ function validarPeriodo(dataInicio, dataFim) {
   }
 }
 
+function validarDias(valor) {
+  if (!Array.isArray(valor) || valor.length === 0) {
+    throw new AppError('VALIDATION_ERROR', 'Informe ao menos um dia do calendário', { field: 'dias' })
+  }
+  if (valor.length > DIAS_POR_ASSOCIACAO_MAX) {
+    throw new AppError('VALIDATION_ERROR', `É permitido associar no máximo ${DIAS_POR_ASSOCIACAO_MAX} dias por vez`, { field: 'dias' })
+  }
+
+  const dias = valor.map((dia, indice) => {
+    // Usar YYYY-MM-DD evita que o fuso horário altere o dia salvo em uma
+    // coluna DATE do MySQL.
+    if (typeof dia !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dia)) {
+      throw new AppError('VALIDATION_ERROR', 'Cada dia deve estar no formato YYYY-MM-DD', { field: `dias[${indice}]` })
+    }
+    const data = new Date(`${dia}T00:00:00.000Z`)
+    if (Number.isNaN(data.getTime()) || data.toISOString().slice(0, 10) !== dia) {
+      throw new AppError('VALIDATION_ERROR', 'Dia do calendário inválido', { field: `dias[${indice}]` })
+    }
+    return dia
+  })
+
+  return [...new Set(dias)]
+}
+
 function registerCalendarioHandlers() {
   handle('calendario:listar', async (payload) => {
     const idUsuario = validarIdUsuario(payload?.idUsuario)
@@ -132,6 +165,41 @@ function registerCalendarioHandlers() {
     )
     const [rows] = await pool.execute(`SELECT ${COLUNAS_EVENTO} FROM CALENDARIO WHERE id_evento = ?`, [resultado.insertId])
     return toEvento(rows[0])
+  })
+
+  // Associa uma tarefa existente a um ou mais dias. A relação é aditiva:
+  // dias que já estavam associados continuam e repetições são ignoradas.
+  handle('calendario:associar-tarefa', async (payload) => {
+    const body = payload ?? {}
+    const idUsuario = validarIdUsuario(body.idUsuario)
+    const idTarefa = validarIdTarefa(body.idTarefa)
+    const dias = validarDias(body.dias)
+    const connection = await pool.getConnection()
+
+    try {
+      await connection.beginTransaction()
+      const [tarefas] = await connection.execute(
+        'SELECT id_tarefa FROM TAREFA WHERE id_tarefa = ? AND id_usuario = ?',
+        [idTarefa, idUsuario]
+      )
+      if (!tarefas.length) {
+        throw new AppError('NOT_FOUND', 'Tarefa não encontrada', { field: 'idTarefa' })
+      }
+
+      const marcadores = dias.map(() => '(?, ?)').join(', ')
+      const valores = dias.flatMap((dia) => [idTarefa, dia])
+      await connection.execute(
+        `INSERT IGNORE INTO TAREFA_CALENDARIO (id_tarefa, data) VALUES ${marcadores}`,
+        valores
+      )
+      await connection.commit()
+      return { idTarefa, dias }
+    } catch (erro) {
+      await connection.rollback()
+      throw erro
+    } finally {
+      connection.release()
+    }
   })
 
   handle('calendario:atualizar', async (payload) => {
