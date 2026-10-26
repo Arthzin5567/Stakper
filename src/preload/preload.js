@@ -65,6 +65,7 @@ contextBridge.exposeInMainWorld('stakper', {
   },
   ping: () => ipcRenderer.invoke('ping'),
   tarefas: {
-    listar: (payload) => ipcRenderer.invoke('tarefas:listar', payload)
+    listar: (payload) => ipcRenderer.invoke('tarefas:listar', payload),
+    criar: (payload) => ipcRenderer.invoke('tarefas:criar', payload)
   }
 })
