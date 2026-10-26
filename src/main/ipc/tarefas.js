@@ -143,6 +143,34 @@ function registerTarefasHandlers() {
     )
     return toTarefa(rows[0])
   })
+
+  // Remove uma tarefa do usuário. O WHERE inclui id_usuario, assim um usuário
+  // não consegue apagar tarefa de outro, mesmo conhecendo o id.
+  handle('tarefas:remover', async (payload) => {
+    const body = payload ?? {}
+
+    // TODO: quando houver login, usar o id da sessão e não o do payload.
+    const idUsuario = Number(body.idUsuario)
+    if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
+      throw new AppError('VALIDATION_ERROR', 'Id de usuário inválido', { field: 'idUsuario' })
+    }
+
+    const idTarefa = Number(body.idTarefa)
+    if (!Number.isInteger(idTarefa) || idTarefa <= 0) {
+      throw new AppError('VALIDATION_ERROR', 'Id de tarefa inválido', { field: 'idTarefa' })
+    }
+
+    const [resultado] = await pool.execute(
+      'DELETE FROM TAREFA WHERE id_tarefa = ? AND id_usuario = ?',
+      [idTarefa, idUsuario]
+    )
+
+    if (resultado.affectedRows === 0) {
+      throw new AppError('NOT_FOUND', 'Tarefa não encontrada', { field: 'idTarefa' })
+    }
+
+    return { idTarefa }
+  })
 }
 
 module.exports = { registerTarefasHandlers }
