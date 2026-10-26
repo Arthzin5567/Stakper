@@ -33,6 +33,7 @@ const path = require('node:path')
 
 // Handlers de tarefas (tarefas:listar, tarefas:criar). Registrados abaixo, junto com o ping.
 const { registerTarefasHandlers } = require('./ipc/tarefas')
+const { registerCalendarioHandlers } = require('./ipc/calendario')
 
 // Funcao que cria uma janela do app. Fica separada para podermos chamar de mais
 // de um lugar (na inicializacao e quando o app for reativado no macOS).
@@ -75,6 +76,7 @@ app.whenReady().then(() => {
 
   // Registra os handlers de tarefas (listar e criar) antes de abrir a janela.
   registerTarefasHandlers()
+  registerCalendarioHandlers()
 
   // Abre a primeira janela do app.
   createWindow()

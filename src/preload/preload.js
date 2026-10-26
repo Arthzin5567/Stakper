@@ -68,5 +68,11 @@ contextBridge.exposeInMainWorld('stakper', {
     listar: (payload) => ipcRenderer.invoke('tarefas:listar', payload),
     criar: (payload) => ipcRenderer.invoke('tarefas:criar', payload),
     remover: (payload) => ipcRenderer.invoke('tarefas:remover', payload)
+  },
+  calendario: {
+    listar: (payload) => ipcRenderer.invoke('calendario:listar', payload),
+    criar: (payload) => ipcRenderer.invoke('calendario:criar', payload),
+    atualizar: (payload) => ipcRenderer.invoke('calendario:atualizar', payload),
+    remover: (payload) => ipcRenderer.invoke('calendario:remover', payload)
   }
 })
