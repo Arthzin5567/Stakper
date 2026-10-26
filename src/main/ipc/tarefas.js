@@ -20,7 +20,7 @@ const ORDENACOES = {
 
 // Colunas usadas em todo SELECT de tarefa, para o retorno ser sempre igual.
 const COLUNAS_TAREFA = `id_tarefa, id_usuario, titulo, descricao, data_criacao,
-             data_limite, prioridade, status, concluida_em`
+             data_limite, prioridade, status, concluida_em, arquivada_em`
 
 // Banco usa snake_case; a API devolve camelCase (GUIA-API, seção 2).
 // Datas viram ISO 8601 (string), que é o formato combinado.
@@ -34,7 +34,8 @@ function toTarefa(row) {
     dataLimite: row.data_limite ? row.data_limite.toISOString() : null,
     prioridade: row.prioridade,
     status: row.status,
-    concluidaEm: row.concluida_em ? row.concluida_em.toISOString() : null
+    concluidaEm: row.concluida_em ? row.concluida_em.toISOString() : null,
+    arquivadaEm: row.arquivada_em ? row.arquivada_em.toISOString() : null
   }
 }
 
@@ -51,8 +52,18 @@ function registerTarefasHandlers() {
       throw new AppError('VALIDATION_ERROR', 'Filtro inválido', { field: 'filtro' })
     }
 
+    if (filtro.incluirArquivadas !== undefined && typeof filtro.incluirArquivadas !== 'boolean') {
+      throw new AppError('VALIDATION_ERROR', 'incluirArquivadas deve ser booleano', { field: 'incluirArquivadas' })
+    }
+
     const condicoes = ['id_usuario = ?']
     const valores = [idUsuario]
+
+    // Por padrão, tarefas arquivadas não aparecem nas telas de trabalho.
+    // O histórico continua disponível com filtro.incluirArquivadas = true.
+    if (!filtro.incluirArquivadas) {
+      condicoes.push('arquivada_em IS NULL')
+    }
 
     if (filtro.status !== undefined) {
       if (!STATUS_VALIDOS.includes(filtro.status)) {
@@ -170,6 +181,36 @@ function registerTarefasHandlers() {
     }
 
     return { idTarefa }
+  })
+
+  // Arquivar não apaga a tarefa: apenas registra quando ela saiu da lista
+  // principal. Usamos COALESCE para que uma chamada repetida mantenha a data
+  // original de arquivamento.
+  handle('tarefas:arquivar', async (payload) => {
+    const body = payload ?? {}
+    const idUsuario = Number(body.idUsuario)
+    if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
+      throw new AppError('VALIDATION_ERROR', 'Id de usuário inválido', { field: 'idUsuario' })
+    }
+
+    const idTarefa = Number(body.idTarefa)
+    if (!Number.isInteger(idTarefa) || idTarefa <= 0) {
+      throw new AppError('VALIDATION_ERROR', 'Id de tarefa inválido', { field: 'idTarefa' })
+    }
+
+    const [resultado] = await pool.execute(
+      'UPDATE TAREFA SET arquivada_em = COALESCE(arquivada_em, ?) WHERE id_tarefa = ? AND id_usuario = ?',
+      [new Date(), idTarefa, idUsuario]
+    )
+    if (resultado.affectedRows === 0) {
+      throw new AppError('NOT_FOUND', 'Tarefa não encontrada', { field: 'idTarefa' })
+    }
+
+    const [rows] = await pool.execute(
+      `SELECT ${COLUNAS_TAREFA} FROM TAREFA WHERE id_tarefa = ? AND id_usuario = ?`,
+      [idTarefa, idUsuario]
+    )
+    return toTarefa(rows[0])
   })
 }
 
