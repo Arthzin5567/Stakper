@@ -62,3 +62,7 @@ if (res.ok) renderizarTarefas(res.data)
 ```
 
 **Observações:** usa o índice `idx_tarefa_usuario_status_limite`. O campo `ordenar` é validado contra uma lista fixa antes de entrar no SQL; nunca concatenar valor vindo da tela na query.
+
+Após a migração de arquivamento, `filtro.incluirArquivadas` pode ser informado
+como booleano. O padrão é `false`, portanto tarefas arquivadas não aparecem na
+lista de trabalho; para consultar o histórico use `true`.
