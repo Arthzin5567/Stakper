@@ -11,5 +11,9 @@
   "type": "commonjs",
   "devDependencies": {
     "electron": "^44.5.1"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.9",
+    "mysql2": "^3.24.6"
   }
 }

@@ -42,8 +42,8 @@ const createWindow = () => {
   // dentro de um processo renderer proprio.
   const win = new BrowserWindow({
     // Tamanho inicial da janela, em pixels.
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 800,
     // webPreferences controla o que a pagina dentro da janela pode fazer.
     // Os padroes do Electron ja sao seguros (contextIsolation ligado e
     // nodeIntegration desligado), entao so mexa aqui se souber o motivo.
