@@ -3,7 +3,7 @@ services:
     image: mysql:9.7
     container_name: 'db'
     env_file:
-      - ./.env
+      - ./.env.example
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
