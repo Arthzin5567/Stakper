@@ -5,6 +5,8 @@
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
+    "start-db": "docker compose up -d",
+    "end-db": "docker compose down -v",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
