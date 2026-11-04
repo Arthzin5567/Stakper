@@ -5,1036 +5,449 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stakper</title>
-    <style>
-      :root {
-        --bg: #f4f6ff;
-        --bg-soft: #edf2ff;
-        --panel: rgba(255, 255, 255, 0.88);
-        --panel-strong: #ffffff;
-        --panel-soft: #eef3ff;
-        --primary: #5b6cff;
-        --primary-strong: #4053e6;
-        --secondary: #8b5cf6;
-        --text: #1d2340;
-        --muted: #6d7697;
-        --border: rgba(124, 138, 255, 0.17);
-        --success: #2bc48a;
-        --warning: #ffb648;
-        --danger: #f87171;
-        --shadow: 0 18px 50px rgba(91, 108, 255, 0.12);
-      }
-
-      * { box-sizing: border-box; }
-
-      html, body {
-        margin: 0;
-        min-height: 100%;
-        font-family: Arial, sans-serif;
-        background: linear-gradient(135deg, #eef3ff 0%, #f8f9ff 100%);
-        color: var(--text);
-      }
-
-      body.focus-mode {
-        background: #0f172a;
-        color: #edf3ff;
-      }
-
-      button, input, select {
-        font: inherit;
-      }
-
-      .shell {
-        display: grid;
-        grid-template-columns: 250px minmax(0, 1fr);
-        min-height: 100vh;
-      }
-
-      .sidebar {
-        background: rgba(17, 24, 39, 0.96);
-        color: #edf3ff;
-        padding: 28px 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 28px;
-      }
-
-      .brand-wrap {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-      }
-
-      .brand-mark {
-        width: 38px;
-        height: 38px;
-        border-radius: 12px;
-        display: grid;
-        place-items: center;
-        background: linear-gradient(135deg, var(--primary), #8aa2ff);
-        color: white;
-        font-weight: 800;
-      }
-
-      .nav {
-        display: grid;
-        gap: 12px;
-      }
-
-      .nav-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 14px;
-        padding: 12px 14px;
-        color: #edf3ff;
-        text-decoration: none;
-        font-weight: 700;
-      }
-
-      .nav-item.active {
-        background: rgba(91, 108, 255, 0.2);
-        border-color: rgba(91, 108, 255, 0.45);
-      }
-
-      .nav-icon {
-        width: 28px;
-        height: 28px;
-        border-radius: 8px;
-        display: grid;
-        place-items: center;
-        background: rgba(255,255,255,0.08);
-        font-size: 0.9rem;
-      }
-
-      .mini-card {
-        margin-top: auto;
-        background: linear-gradient(180deg, rgba(91,108,255,0.18), rgba(139,92,246,0.08));
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 18px;
-        padding: 18px 16px;
-      }
-
-      .mini-card .label {
-        color: rgba(237, 243, 255, 0.7);
-        font-size: 0.72rem;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-      }
-
-      .mini-card strong {
-        display: block;
-        font-size: 1.2rem;
-        margin-bottom: 8px;
-      }
-
-      .mini-card span {
-        font-size: 0.75rem;
-        color: rgba(237, 243, 255, 0.8);
-      }
-
-      .content {
-        padding: 24px;
-      }
-
-      .topbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-      }
-
-      .topbar-right {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .pill {
-        padding: 10px 12px;
-        border-radius: 999px;
-        background: rgba(91, 108, 255, 0.08);
-        border: 1px solid rgba(91, 108, 255, 0.12);
-        color: var(--primary-strong);
-        font-weight: 700;
-        font-size: 0.76rem;
-      }
-
-      .focus-button {
-        border: none;
-        border-radius: 12px;
-        padding: 12px 18px;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: white;
-        font-weight: 700;
-        cursor: pointer;
-        box-shadow: 0 10px 24px rgba(91, 108, 255, 0.22);
-      }
-
-      .timer-actions {
-        display: flex;
-        gap: 10px;
-        width: 100%;
-        justify-content: center;
-      }
-
-      .timer-stop {
-        background: rgba(248, 113, 113, 0.12);
-        color: #b42318;
-        border: 1px solid rgba(248, 113, 113, 0.2);
-        border-radius: 12px;
-        padding: 12px 18px;
-        font-weight: 700;
-        cursor: pointer;
-      }
-
-      .hero {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(237,242,255,0.9));
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        padding: 24px 28px;
-        box-shadow: var(--shadow);
-        margin-bottom: 20px;
-      }
-
-      .eyebrow {
-        margin: 0 0 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        color: var(--muted);
-        font-size: 0.7rem;
-        font-weight: 700;
-      }
-
-      .hero h1 {
-        margin: 0;
-        font-size: clamp(2rem, 2vw, 2.8rem);
-      }
-
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(180px, 1fr));
-        gap: 18px;
-        margin-bottom: 22px;
-      }
-
-      .stat-card {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: 22px;
-        padding: 18px 20px;
-        box-shadow: var(--shadow);
-      }
-
-      .stat-label {
-        color: var(--muted);
-        font-size: 0.8rem;
-        margin-bottom: 8px;
-      }
-
-      .stat-value {
-        font-weight: 800;
-        font-size: 2rem;
-      }
-
-      .dashboard-grid {
-        display: grid;
-        grid-template-columns: 1.45fr 0.95fr;
-        gap: 22px;
-      }
-
-      .panel {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        padding: 22px;
-        box-shadow: var(--shadow);
-      }
-
-      .panel-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 16px;
-      }
-
-      .panel-header h3 {
-        margin: 0;
-        font-size: 1.08rem;
-      }
-
-      .panel-link {
-        color: var(--primary);
-        text-decoration: none;
-        font-weight: 700;
-        font-size: 0.8rem;
-      }
-
-      .task-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: grid;
-        gap: 12px;
-      }
-
-      .task-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        background: var(--panel-soft);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 12px 14px;
-      }
-
-      .task-item.done {
-        opacity: 0.65;
-        text-decoration: line-through;
-      }
-
-      .task-item span {
-        font-weight: 600;
-      }
-
-      .task-done {
-        border: none;
-        border-radius: 50%;
-        width: 28px;
-        height: 28px;
-        background: var(--success);
-        color: white;
-        cursor: pointer;
-      }
-
-      .task-form {
-        display: flex;
-        gap: 10px;
-        margin-top: 18px;
-      }
-
-      .task-form input {
-        flex: 1;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 12px 14px;
-        background: rgba(255,255,255,0.8);
-      }
-
-      .primary-button,
-      .timer-button,
-      .focus-action {
-        border: none;
-        border-radius: 12px;
-        background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-        color: white;
-        font-weight: 700;
-        cursor: pointer;
-      }
-
-      .primary-button { padding: 12px 16px; }
-
-      .right-column {
-        display: grid;
-        gap: 22px;
-      }
-
-      .timer-box {
-        display: grid;
-        place-items: center;
-        text-align: center;
-        gap: 12px;
-        min-height: 240px;
-      }
-
-      .timer-display {
-        font-size: clamp(2.5rem, 4vw, 4rem);
-        font-weight: 800;
-      }
-
-      .timer-button {
-        padding: 12px 18px;
-      }
-
-      .calendar-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 8px;
-        margin-top: 18px;
-      }
-
-      .calendar-day {
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 10px 8px;
-        text-align: center;
-        font-size: 0.7rem;
-        font-weight: 700;
-        color: var(--muted);
-      }
-
-      .calendar-day.active { background: rgba(91, 108, 255, 0.14); color: var(--primary); }
-      .calendar-day.focus { background: rgba(139, 92, 246, 0.12); color: var(--secondary); }
-      .calendar-day.rest { background: rgba(255, 182, 72, 0.12); color: #b76d00; }
-
-      .schedule-list {
-        list-style: none;
-        margin: 18px 0 0;
-        padding: 0;
-        display: grid;
-        gap: 12px;
-      }
-
-      .schedule-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: rgba(91, 108, 255, 0.05);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 12px 14px;
-      }
-
-      .schedule-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--primary);
-      }
-
-      .schedule-item strong {
-        display: block;
-        margin-bottom: 4px;
-      }
-
-      .muted {
-        color: var(--muted);
-        font-size: 0.75rem;
-      }
-
-      .view {
-        display: none;
-      }
-
-      .view.active {
-        display: block;
-      }
-
-      .welcome-grid,
-      .auth-grid,
-      .profile-grid,
-      .kanban-grid {
-        display: grid;
-        gap: 22px;
-      }
-
-      .welcome-grid {
-        grid-template-columns: 1.3fr 0.7fr;
-      }
-
-      .auth-grid {
-        grid-template-columns: repeat(2, minmax(260px, 1fr));
-      }
-
-      .profile-grid {
-        grid-template-columns: 0.9fr 1.1fr;
-      }
-
-      .kanban-grid {
-        grid-template-columns: repeat(3, minmax(220px, 1fr));
-      }
-
-      .welcome-hero,
-      .auth-card,
-      .profile-card,
-      .table-panel,
-      .kanban-column {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        padding: 22px;
-        box-shadow: var(--shadow);
-      }
-
-      .welcome-hero h2 {
-        margin: 0 0 12px;
-        font-size: clamp(2rem, 2vw, 3rem);
-      }
-
-      .welcome-hero p {
-        margin: 0 0 20px;
-        color: var(--muted);
-        line-height: 1.6;
-      }
-
-      .welcome-actions {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      .field {
-        display: grid;
-        gap: 8px;
-        margin-bottom: 14px;
-      }
-
-      .field label {
-        font-weight: 700;
-        font-size: 0.82rem;
-      }
-
-      .field input,
-      .field select,
-      .filters input,
-      .filters select {
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 12px 14px;
-        background: rgba(255,255,255,0.8);
-      }
-
-      .auth-card h3,
-      .profile-card h3 {
-        margin-top: 0;
-      }
-
-      .avatar {
-        width: 88px;
-        height: 88px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: white;
-        display: grid;
-        place-items: center;
-        font-size: 1.8rem;
-        font-weight: 800;
-        margin-bottom: 16px;
-      }
-
-      .toolbar {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        align-items: center;
-        margin-bottom: 16px;
-        flex-wrap: wrap;
-      }
-
-      .filters {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      th, td {
-        padding: 12px 10px;
-        text-align: left;
-        border-bottom: 1px solid var(--border);
-      }
-
-      th {
-        color: var(--muted);
-        font-size: 0.78rem;
-        text-transform: uppercase;
-      }
-
-      .badge {
-        display: inline-block;
-        padding: 6px 10px;
-        border-radius: 999px;
-        font-size: 0.7rem;
-        font-weight: 800;
-        background: rgba(91,108,255,0.1);
-        color: var(--primary-strong);
-        text-transform: capitalize;
-      }
-
-      .badge.alta { background: rgba(248,113,113,0.12); color: #b42318; }
-      .badge.media { background: rgba(255,182,72,0.12); color: #a56200; }
-      .badge.baixa { background: rgba(43,196,138,0.12); color: #0b7a52; }
-
-      .status-tag {
-        display: inline-block;
-        padding: 6px 10px;
-        border-radius: 999px;
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: capitalize;
-      }
-
-      .status-pendente { background: rgba(255,182,72,0.12); color: #a56200; }
-      .status-em-andamento { background: rgba(91,108,255,0.12); color: var(--primary-strong); }
-      .status-concluida { background: rgba(43,196,138,0.12); color: #0b7a52; }
-
-      .row-actions {
-        display: flex;
-        gap: 8px;
-      }
-
-      .mini-btn {
-        padding: 7px 10px;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-weight: 700;
-      }
-
-      .mini-btn.edit { background: rgba(91,108,255,0.12); color: var(--primary-strong); }
-      .mini-btn.delete { background: rgba(248,113,113,0.12); color: #b42318; }
-
-      .kanban-column {
-        min-height: 400px;
-      }
-
-      .kanban-column h4 {
-        margin: 0 0 16px;
-      }
-
-      .kanban-list {
-        display: grid;
-        gap: 12px;
-      }
-
-      .kanban-card {
-        background: white;
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 12px;
-      }
-
-      .kanban-card strong {
-        display: block;
-        margin-bottom: 8px;
-      }
-
-      .meta-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 8px;
-        font-size: 0.75rem;
-        color: var(--muted);
-        margin-top: 8px;
-      }
-
-      .focus-panel {
-        display: grid;
-        gap: 16px;
-      }
-
-      .focus-options {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-
-      .focus-option {
-        border: 1px solid var(--border);
-        background: rgba(91, 108, 255, 0.04);
-        color: var(--text);
-        border-radius: 10px;
-        padding: 9px 12px;
-        font-weight: 700;
-        cursor: pointer;
-      }
-
-      .focus-option.is-active {
-        background: rgba(91, 108, 255, 0.14);
-        border-color: rgba(91, 108, 255, 0.30);
-        color: var(--primary-strong);
-      }
-
-      .focus-meta {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: rgba(91, 108, 255, 0.05);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 14px 16px;
-      }
-
-      .focus-meta strong {
-        display: block;
-        font-size: 1.1rem;
-      }
-
-      .focus-action {
-        padding: 12px 18px;
-      }
-
-      .focus-breaks {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-      }
-
-      .focus-break {
-        flex: 1;
-        background: rgba(255, 182, 72, 0.08);
-        border: 1px solid rgba(255, 182, 72, 0.24);
-        border-radius: 12px;
-        padding: 10px 12px;
-        font-weight: 700;
-        color: #a56200;
-      }
-
-      body.focus-mode .panel,
-      body.focus-mode .stat-card,
-      body.focus-mode .hero,
-      body.focus-mode .sidebar .mini-card {
-        background: rgba(15, 23, 42, 0.82);
-        border-color: rgba(148, 163, 184, 0.3);
-        color: #edf3ff;
-      }
-
-      body.focus-mode .task-item,
-      body.focus-mode .schedule-item,
-      body.focus-mode .focus-meta {
-        background: rgba(91, 108, 255, 0.12);
-      }
-
-      body.focus-mode .pill,
-      body.focus-mode .nav-item,
-      body.focus-mode .focus-option {
-        background: rgba(148, 163, 184, 0.08);
-        color: #edf3ff;
-      }
-    </style>
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="shell">
+    <svg class="sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></symbol>
+        <symbol id="i-tasks" viewBox="0 0 24 24"><path d="m4 7 2 2 3.5-4"/><path d="M13 7.5h7"/><path d="m4 16 2 2 3.5-4"/><path d="M13 16.5h7"/></symbol>
+        <symbol id="i-board" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9.2 4.5v15M14.8 4.5v15"/></symbol>
+        <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20c1.2-3.6 4-5.5 7.5-5.5s6.300 1.900 7.500 5.500"/></symbol>
+        <symbol id="i-focus" viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.500"/><path d="M12 9v4l2.500 2M9.500 2.500h5"/></symbol>
+        <symbol id="i-logout" viewBox="0 0 24 24"><path d="M14 4.500H6a1.500 1.500 0 0 0-1.500 1.500v12A1.500 1.500 0 0 0 6 19.500h8"/><path d="M10.500 12H20m-3.500-3.500L20 12l-3.500 3.500"/></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+        <symbol id="i-edit" viewBox="0 0 24 24"><path d="m14.500 5.500 4 4L8 20H4v-4L14.500 5.500Z"/></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.500 7h15M9.500 7V4.500h5V7M6.500 7l1 12.500h9l1-12.500"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.500"/><path d="m16 16 4.500 4.500"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.500 4.500 4.500L19 7.500"/></symbol>
+        <symbol id="i-left" viewBox="0 0 24 24"><path d="m14.500 6-6 6 6 6"/></symbol>
+        <symbol id="i-right" viewBox="0 0 24 24"><path d="m9.500 6 6 6-6 6"/></symbol>
+        <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4.500 9.500v-5h5M19.500 9.500v-5h-5M4.500 14.500v5h5M19.500 14.500v5h-5"/></symbol>
+        <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+        <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.500 12S6 5.500 12 5.500 21.500 12 21.500 12 18 18.500 12 18.500 2.500 12 2.500 12Z"/><circle cx="12" cy="12" r="2.800"/></symbol>
+      </defs>
+    </svg>
+
+    <!-- ===================== ENTRADA ===================== -->
+    <section id="auth-screen" class="auth" hidden>
+      <div class="auth-brand">
+        <div class="brand">
+          <span class="brand-mark">S</span>
+          <span>Stakper</span>
+        </div>
+        <div class="auth-pitch">
+          <h1>Sua rotina de estudos em um só lugar.</h1>
+          <ul>
+            <li><svg class="icon"><use href="#i-check"/></svg> Veja o que fazer primeiro, com prazos claros</li>
+            <li><svg class="icon"><use href="#i-check"/></svg> Organize as tarefas em lista ou quadro</li>
+            <li><svg class="icon"><use href="#i-check"/></svg> Estude sem distração com o modo foco</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="auth-main">
+        <div class="auth-box">
+          <div class="tabs" role="tablist" aria-label="Acesso à conta">
+            <button class="tab is-active" id="tab-login" role="tab" type="button" aria-selected="true" aria-controls="login-form" data-action="auth-tab" data-tab="login">Entrar</button>
+            <button class="tab" id="tab-register" role="tab" type="button" aria-selected="false" aria-controls="register-form" data-action="auth-tab" data-tab="register">Criar conta</button>
+          </div>
+
+          <form id="login-form" role="tabpanel" aria-labelledby="tab-login" novalidate>
+            <h2>Que bom ter você de volta</h2>
+            <p class="muted">Entre para continuar de onde parou.</p>
+            <div class="field">
+              <label for="login-email">E-mail</label>
+              <input id="login-email" name="email" type="email" autocomplete="email" placeholder="voce@email.com" />
+              <small class="error" data-error-for="login-email"></small>
+            </div>
+            <div class="field">
+              <label for="login-password">Senha</label>
+              <div class="input-with-action">
+                <input id="login-password" name="password" type="password" autocomplete="current-password" />
+                <button class="icon-btn" type="button" data-action="toggle-password" data-target="login-password" aria-label="Mostrar senha" aria-pressed="false"><svg class="icon"><use href="#i-eye"/></svg></button>
+              </div>
+              <small class="error" data-error-for="login-password"></small>
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+          </form>
+
+          <form id="register-form" role="tabpanel" aria-labelledby="tab-register" novalidate hidden>
+            <h2>Crie sua conta</h2>
+            <p class="muted">Leva menos de um minuto.</p>
+            <div class="field">
+              <label for="register-name">Nome</label>
+              <input id="register-name" name="name" type="text" autocomplete="name" maxlength="100" />
+              <small class="error" data-error-for="register-name"></small>
+            </div>
+            <div class="field">
+              <label for="register-email">E-mail</label>
+              <input id="register-email" name="email" type="email" autocomplete="email" placeholder="voce@email.com" maxlength="150" />
+              <small class="error" data-error-for="register-email"></small>
+            </div>
+            <div class="field">
+              <label for="register-course">Curso</label>
+              <input id="register-course" name="course" type="text" placeholder="Ex.: Engenharia de Software" />
+              <small class="error" data-error-for="register-course"></small>
+            </div>
+            <div class="field">
+              <label for="register-password">Senha</label>
+              <div class="input-with-action">
+                <input id="register-password" name="password" type="password" autocomplete="new-password" aria-describedby="register-password-hint" />
+                <button class="icon-btn" type="button" data-action="toggle-password" data-target="register-password" aria-label="Mostrar senha" aria-pressed="false"><svg class="icon"><use href="#i-eye"/></svg></button>
+              </div>
+              <small class="hint" id="register-password-hint">Use pelo menos 8 caracteres.</small>
+              <small class="error" data-error-for="register-password"></small>
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">Criar conta</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== APLICATIVO ===================== -->
+    <div id="app" class="shell" hidden>
       <aside class="sidebar">
-        <div class="brand-wrap">
-          <div class="brand-mark">S</div>
+        <div class="brand">
+          <span class="brand-mark">S</span>
           <span>Stakper</span>
         </div>
 
         <nav class="nav" aria-label="Menu principal">
-          <button class="nav-item active" data-view="home" type="button"><span class="nav-icon">⌂</span> Home</button>
-          <button class="nav-item" data-view="profile" type="button"><span class="nav-icon">◉</span> Perfil</button>
-          <button class="nav-item" data-view="tasks" type="button"><span class="nav-icon">✓</span> Tarefas</button>
-          <button class="nav-item" data-view="kanban" type="button"><span class="nav-icon">▦</span> Kanban</button>
+          <button class="nav-item" data-view="home" type="button"><svg class="icon"><use href="#i-home"/></svg> Home</button>
+          <button class="nav-item" data-view="tasks" type="button"><svg class="icon"><use href="#i-tasks"/></svg> Tarefas <span class="nav-count" id="nav-count"></span></button>
+          <button class="nav-item" data-view="kanban" type="button"><svg class="icon"><use href="#i-board"/></svg> Kanban</button>
+          <button class="nav-item" data-view="profile" type="button"><svg class="icon"><use href="#i-user"/></svg> Perfil</button>
         </nav>
 
-        <div class="mini-card">
-          <div class="label">Progresso</div>
-          <strong>78%</strong>
-          <span>Meta semanal quase concluída</span>
+        <button class="focus-launch" type="button" data-action="open-focus">
+          <svg class="icon"><use href="#i-focus"/></svg>
+          <span id="focus-launch-label">Modo foco</span>
+        </button>
+
+        <div class="sidebar-bottom">
+          <div class="progress-card">
+            <div class="progress-head">
+              <span>Progresso</span>
+              <strong data-progress-percent>0%</strong>
+            </div>
+            <div class="bar" role="presentation"><span data-progress-bar></span></div>
+            <small data-progress-label></small>
+          </div>
+
+          <div class="user-row">
+            <span class="avatar avatar-sm" data-user-initials></span>
+            <div class="user-text">
+              <strong data-user-first-name></strong>
+              <small data-user-course></small>
+            </div>
+            <button class="icon-btn icon-btn-dark" type="button" data-action="logout" aria-label="Sair da conta" title="Sair da conta"><svg class="icon"><use href="#i-logout"/></svg></button>
+          </div>
         </div>
       </aside>
 
       <main class="content">
-        <header class="topbar">
-          <div class="pill">Semana 42</div>
-          <div class="topbar-right">
-            <div class="pill" id="user-pill">Ana · estudante</div>
-            <button id="focus-button" class="focus-button" type="button">Ativar modo foco</button>
-          </div>
-        </header>
-
-        <section id="view-home" class="view active">
-          <div class="hero">
+        <!-- HOME -->
+        <section id="view-home" class="view" aria-labelledby="home-title">
+          <header class="page-head">
             <div>
-              <p class="eyebrow">Resumo da rotina</p>
-              <h1>Organize seu dia sem perder foco</h1>
+              <h1 id="home-title"></h1>
+              <p class="muted" id="home-date"></p>
             </div>
-            <div class="pill">Acompanhe o ritmo do estudo</div>
-          </div>
+            <button class="btn btn-primary" type="button" data-action="new-task"><svg class="icon"><use href="#i-plus"/></svg> Nova tarefa</button>
+          </header>
 
           <div class="stats-grid">
             <div class="stat-card">
-              <div class="stat-label">Tarefas pendentes</div>
-              <div class="stat-value" data-stat="tasks">0</div>
+              <span class="stat-label">Tarefas pendentes</span>
+              <strong class="stat-value" id="stat-pending">0</strong>
+              <small id="stat-pending-hint" class="muted"></small>
             </div>
             <div class="stat-card">
-              <div class="stat-label">Sequência de foco</div>
-              <div class="stat-value" data-stat="focus">0</div>
+              <span class="stat-label">Sequência de foco</span>
+              <strong class="stat-value" id="stat-streak">0 dias</strong>
+              <small id="stat-streak-hint" class="muted"></small>
             </div>
             <div class="stat-card">
-              <div class="stat-label">Horas de estudo</div>
-              <div class="stat-value" data-stat="study">0</div>
+              <span class="stat-label">Foco nesta semana</span>
+              <strong class="stat-value" id="stat-week">0 min</strong>
+              <small id="stat-week-hint" class="muted"></small>
             </div>
           </div>
 
           <div class="dashboard-grid">
-            <div class="left-column">
-              <div class="panel">
-                <div class="panel-header">
-                  <h3>Tarefas pendentes</h3>
-                  <button class="panel-link" type="button" data-view="tasks">Ver todas</button>
+            <div class="stack">
+              <section class="card">
+                <div class="card-head">
+                  <h2>Próximas tarefas</h2>
+                  <button class="link-btn" type="button" data-view="tasks" id="see-all-tasks">Ver todas</button>
                 </div>
-
                 <ul id="task-list" class="task-list"></ul>
-              </div>
+              </section>
 
-              <div class="panel" style="margin-top: 22px;">
-                <div class="panel-header">
-                  <h3>Agenda de hoje</h3>
-                </div>
+              <section class="card">
+                <div class="card-head"><h2>Esta semana</h2></div>
+                <div id="week-strip" class="week-strip"></div>
+              </section>
 
-                <ul class="schedule-list">
-                  <li class="schedule-item">
-                    <span class="schedule-dot"></span>
-                    <div>
-                      <strong>Estudo de cálculo</strong>
-                      <span class="muted">09:00 - 10:30</span>
-                    </div>
-                  </li>
-                  <li class="schedule-item">
-                    <span class="schedule-dot" style="background: var(--secondary);"></span>
-                    <div>
-                      <strong>Leitura de literatura</strong>
-                      <span class="muted">11:00 - 12:00</span>
-                    </div>
-                  </li>
-                  <li class="schedule-item">
-                    <span class="schedule-dot" style="background: var(--success);"></span>
-                    <div>
-                      <strong>Revisão de biologia</strong>
-                      <span class="muted">14:00 - 15:00</span>
-                    </div>
-                  </li>
-                </ul>
-              </div>
+              <section class="card">
+                <div class="card-head"><h2>Agenda de hoje</h2></div>
+                <ul id="agenda-list" class="agenda-list"></ul>
+              </section>
             </div>
 
-            <aside class="right-column">
-              <section class="panel timer-box">
-                <h3>Temporizador</h3>
-                <div id="timer-display" class="timer-display">25:00</div>
-                <div class="timer-actions">
-                  <button id="timer-button" class="timer-button" type="button">Iniciar</button>
-                  <button id="timer-stop" class="timer-stop" type="button">Encerrar</button>
-                </div>
-                <p id="info" class="muted"></p>
-              </section>
+            <section class="card timer-card" aria-label="Temporizador de foco">
+              <div class="segmented" role="group" aria-label="Tipo de sessão">
+                <button type="button" class="seg" data-action="timer-mode" data-mode="foco">Foco</button>
+                <button type="button" class="seg" data-action="timer-mode" data-mode="curta">Pausa curta</button>
+                <button type="button" class="seg" data-action="timer-mode" data-mode="longa">Pausa longa</button>
+              </div>
 
-              <section class="panel focus-panel">
-                <div class="panel-header">
-                  <h3>Modo foco</h3>
+              <div class="ring" data-timer-ring>
+                <svg viewBox="0 0 120 120" aria-hidden="true">
+                  <circle class="ring-track" cx="60" cy="60" r="54"/>
+                  <circle class="ring-value" cx="60" cy="60" r="54" data-ring-value/>
+                </svg>
+                <div class="ring-text">
+                  <strong data-timer-display role="timer">25:00</strong>
+                  <small data-timer-caption>Foco</small>
                 </div>
+              </div>
 
-                <div class="focus-options">
-                  <button class="focus-option is-active" data-focus="25" type="button">25 min</button>
-                  <button class="focus-option" data-focus="50" type="button">50 min</button>
-                  <button class="focus-option" data-focus="90" type="button">90 min</button>
+              <div class="presets" data-presets>
+                <div class="segmented" role="group" aria-label="Duração do foco">
+                  <button type="button" class="seg" data-action="preset" data-preset="25">25 min</button>
+                  <button type="button" class="seg" data-action="preset" data-preset="50">50 min</button>
+                  <button type="button" class="seg" data-action="preset" data-preset="90">90 min</button>
+                  <button type="button" class="seg" data-action="preset" data-preset="custom">Outro</button>
                 </div>
-
-                <div class="focus-meta">
-                  <div>
-                    <span class="muted">Sessão atual</span>
-                    <strong id="focus-session">25 min</strong>
+                <div class="custom-time" id="custom-time" hidden>
+                  <div class="field">
+                    <label for="custom-focus">Foco (min)</label>
+                    <input id="custom-focus" type="number" min="10" max="180" />
                   </div>
-                  <div>
-                    <span class="muted">Pausa</span>
-                    <strong id="break-session">5 min</strong>
+                  <div class="field">
+                    <label for="custom-break">Pausa (min)</label>
+                    <input id="custom-break" type="number" min="5" max="60" />
                   </div>
                 </div>
+              </div>
 
-                <div class="focus-breaks">
-                  <button class="focus-break" type="button">Pausa curta 5 min</button>
-                  <button class="focus-break" type="button">Pausa longa 15 min</button>
-                </div>
+              <div class="field field-tight">
+                <label for="focus-task">Focar em</label>
+                <select id="focus-task" class="js-focus-task"></select>
+              </div>
 
-                <div class="field">
-                  <label for="custom-focus">Tempo customizado</label>
-                  <input id="custom-focus" type="number" min="10" max="180" value="25" />
-                </div>
-                <div class="field">
-                  <label for="custom-break">Pausa customizada</label>
-                  <input id="custom-break" type="number" min="5" max="60" value="5" />
-                </div>
-                <button id="apply-focus" class="focus-action" type="button">Aplicar configuração</button>
-              </section>
-
-              <section class="panel">
-                <div class="panel-header">
-                  <h3>Calendário</h3>
-                </div>
-                <div id="calendar-days" class="calendar-grid"></div>
-              </section>
-
-              <section class="panel">
-                <div class="panel-header">
-                  <h3>Próximos prazos</h3>
-                </div>
-
-                <ul class="schedule-list">
-                  <li class="schedule-item">
-                    <span class="schedule-dot" style="background: var(--danger);"></span>
-                    <div>
-                      <strong>Trabalho de Física</strong>
-                      <span class="muted">Entrega em 2 dias</span>
-                    </div>
-                  </li>
-                  <li class="schedule-item">
-                    <span class="schedule-dot" style="background: var(--warning);"></span>
-                    <div>
-                      <strong>Mapa mental de Química</strong>
-                      <span class="muted">Entrega em 4 dias</span>
-                    </div>
-                  </li>
-                  <li class="schedule-item">
-                    <span class="schedule-dot" style="background: var(--success);"></span>
-                    <div>
-                      <strong>Leitura de Sociologia</strong>
-                      <span class="muted">Revisão em 1 semana</span>
-                    </div>
-                  </li>
-                </ul>
-              </section>
-            </aside>
+              <div class="timer-actions">
+                <button class="btn btn-primary" type="button" data-action="timer-toggle" data-timer-toggle>Iniciar</button>
+                <button class="btn btn-ghost" type="button" data-action="timer-stop" data-timer-stop>Encerrar</button>
+                <button class="icon-btn icon-btn-outline" type="button" data-action="open-focus" aria-label="Abrir em tela cheia" title="Abrir em tela cheia"><svg class="icon"><use href="#i-expand"/></svg></button>
+              </div>
+            </section>
           </div>
         </section>
 
-        <section id="view-auth" class="view active">
-          <div class="auth-grid" style="margin-top: 22px; max-width: 1000px;">
-            <form id="login-form" class="auth-card">
-              <h3>Login</h3>
-              <div class="field">
-                <label for="login-email">E-mail</label>
-                <input id="login-email" name="email" type="email" value="ana@stakper.com" required />
-              </div>
-              <div class="field">
-                <label for="login-password">Senha</label>
-                <input id="login-password" name="password" type="password" value="123456" required />
-              </div>
-              <button class="primary-button" type="submit">Entrar</button>
-            </form>
-
-            <form id="register-form" class="auth-card">
-              <h3>Cadastro</h3>
-              <div class="field">
-                <label for="register-name">Nome</label>
-                <input id="register-name" name="name" type="text" value="Ana Silva" required />
-              </div>
-              <div class="field">
-                <label for="register-email">E-mail</label>
-                <input id="register-email" name="email" type="email" value="ana@stakper.com" required />
-              </div>
-              <div class="field">
-                <label for="register-course">Curso</label>
-                <input id="register-course" name="course" type="text" value="Engenharia de Software" required />
-              </div>
-              <button class="primary-button" type="submit">Criar conta</button>
-            </form>
-          </div>
-        </section>
-
-        <section id="view-profile" class="view">
-          <div class="profile-grid">
-            <div class="profile-card">
-              <div class="avatar">AS</div>
-              <h3 id="profile-name">Ana Silva</h3>
-              <p class="muted" id="profile-meta">Engenharia de Software · 3º semestre</p>
-              <div class="stat-card" style="margin-top: 16px; padding: 16px;">
-                <div class="stat-label">Meta geral</div>
-                <div class="stat-value">82%</div>
-              </div>
+        <!-- TAREFAS -->
+        <section id="view-tasks" class="view" aria-labelledby="tasks-title">
+          <header class="page-head">
+            <div>
+              <h1 id="tasks-title">Tarefas</h1>
+              <p class="muted" id="tasks-summary"></p>
             </div>
+            <button class="btn btn-primary" type="button" data-action="new-task" title="Atalho: Ctrl + N"><svg class="icon"><use href="#i-plus"/></svg> Nova tarefa</button>
+          </header>
 
-            <form id="profile-form" class="profile-card">
-              <div class="panel-header">
-                <h3>Detalhes do perfil</h3>
-              </div>
-              <div class="field">
-                <label for="profile-name-input">Nome</label>
-                <input id="profile-name-input" name="name" type="text" value="Ana Silva" required />
-              </div>
-              <div class="field">
-                <label for="profile-course-input">Curso</label>
-                <input id="profile-course-input" name="course" type="text" value="Engenharia de Software" required />
-              </div>
-              <div class="field">
-                <label for="profile-objective-input">Objetivo semanal</label>
-                <input id="profile-objective-input" name="objective" type="text" value="Concluir 3 atividades prioritárias" required />
-              </div>
-              <button class="primary-button" type="submit">Salvar perfil</button>
-            </form>
-          </div>
-        </section>
-
-        <section id="view-tasks" class="view">
-          <div class="table-panel">
+          <div class="card card-flush">
             <div class="toolbar">
-              <div class="filters">
-                <input id="task-search" type="text" placeholder="Pesquisar tarefa..." />
-                <select id="task-status-filter">
-                  <option value="all">Todos os status</option>
-                  <option value="pendente">Pendente</option>
-                  <option value="em-andamento">Em andamento</option>
-                  <option value="concluida">Concluída</option>
-                </select>
-                <select id="task-folder-filter">
-                  <option value="all">Todas as pastas</option>
-                  <option value="universidade">Universidade</option>
-                  <option value="projeto">Projeto</option>
-                  <option value="pessoal">Pessoal</option>
-                </select>
+              <div class="search">
+                <svg class="icon"><use href="#i-search"/></svg>
+                <input id="task-search" type="search" placeholder="Pesquisar tarefa" aria-label="Pesquisar tarefa" />
               </div>
-              <button class="primary-button" type="button" id="add-task-btn">Adicionar tarefa</button>
+              <select id="task-status-filter" aria-label="Filtrar por status">
+                <option value="all">Todos os status</option>
+                <option value="pendente">A fazer</option>
+                <option value="em-andamento">Em andamento</option>
+                <option value="concluida">Concluída</option>
+              </select>
+              <select id="task-sort" aria-label="Ordenar tarefas">
+                <option value="prazo">Ordenar por prazo</option>
+                <option value="prioridade">Ordenar por prioridade</option>
+                <option value="titulo">Ordenar por título</option>
+              </select>
             </div>
+            <div id="folder-chips" class="chips" role="group" aria-label="Filtrar por pasta"></div>
 
-            <div class="panel-header" style="margin-bottom: 12px;">
-              <h3>Pastas</h3>
-            </div>
-            <div id="folder-chips" class="focus-options" style="margin-bottom: 18px;"></div>
-
-            <table>
+            <table class="task-table" id="task-table">
               <thead>
                 <tr>
-                  <th>Título</th>
-                  <th>Pasta</th>
-                  <th>Prioridade</th>
-                  <th>Status</th>
-                  <th>Prazo</th>
-                  <th>Ações</th>
+                  <th class="col-check"><span class="sr-only">Concluída</span></th>
+                  <th>Tarefa</th>
+                  <th class="col-priority">Prioridade</th>
+                  <th class="col-status">Status</th>
+                  <th class="col-due">Prazo</th>
+                  <th class="col-actions"><span class="sr-only">Ações</span></th>
                 </tr>
               </thead>
               <tbody id="task-table-body"></tbody>
             </table>
+            <div id="task-empty" class="empty" hidden></div>
           </div>
         </section>
 
-        <section id="view-kanban" class="view">
-          <div class="panel">
-            <div class="panel-header">
-              <h3>Quadro Kanban</h3>
-              <button class="panel-link" type="button" data-view="tasks">Organizar por prioridade</button>
+        <!-- KANBAN -->
+        <section id="view-kanban" class="view" aria-labelledby="kanban-title">
+          <header class="page-head">
+            <div>
+              <h1 id="kanban-title">Kanban</h1>
+              <p class="muted">Arraste os cartões ou use as setas para mudar o status.</p>
             </div>
+            <select id="kanban-sort" aria-label="Ordenar cartões">
+              <option value="prazo">Ordenar por prazo</option>
+              <option value="prioridade">Ordenar por prioridade</option>
+            </select>
+          </header>
+          <div class="kanban-grid" id="kanban-grid"></div>
+        </section>
 
-            <div class="kanban-grid">
-              <div class="kanban-column">
-                <h4>À fazer</h4>
-                <div id="kanban-pendente" class="kanban-list"></div>
-              </div>
-              <div class="kanban-column">
-                <h4>Em andamento</h4>
-                <div id="kanban-em-andamento" class="kanban-list"></div>
-              </div>
-              <div class="kanban-column">
-                <h4>Concluído</h4>
-                <div id="kanban-concluida" class="kanban-list"></div>
-              </div>
+        <!-- PERFIL -->
+        <section id="view-profile" class="view" aria-labelledby="profile-title">
+          <header class="page-head">
+            <div>
+              <h1 id="profile-title">Perfil</h1>
+              <p class="muted">Seus dados e o seu progresso.</p>
             </div>
+          </header>
+
+          <div class="profile-grid">
+            <aside class="card profile-summary">
+              <span class="avatar avatar-lg" data-user-initials></span>
+              <h2 id="profile-name"></h2>
+              <p class="muted" id="profile-meta"></p>
+
+              <dl class="profile-stats">
+                <div><dt>Tarefas concluídas</dt><dd id="profile-done"></dd></div>
+                <div><dt>Foco nesta semana</dt><dd id="profile-week"></dd></div>
+                <div><dt>Sequência de foco</dt><dd id="profile-streak"></dd></div>
+              </dl>
+
+              <div class="profile-goal">
+                <span class="stat-label">Objetivo semanal</span>
+                <p id="profile-objective"></p>
+              </div>
+            </aside>
+
+            <form id="profile-form" class="card" novalidate>
+              <div class="card-head"><h2>Dados da conta</h2></div>
+              <div class="field">
+                <label for="profile-name-input">Nome</label>
+                <input id="profile-name-input" type="text" maxlength="100" autocomplete="name" />
+                <small class="error" data-error-for="profile-name-input"></small>
+              </div>
+              <div class="field">
+                <label for="profile-email-input">E-mail</label>
+                <input id="profile-email-input" type="email" maxlength="150" autocomplete="email" />
+                <small class="error" data-error-for="profile-email-input"></small>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="profile-course-input">Curso</label>
+                  <input id="profile-course-input" type="text" />
+                </div>
+                <div class="field">
+                  <label for="profile-semester-input">Semestre</label>
+                  <select id="profile-semester-input"></select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="profile-objective-input">Objetivo semanal</label>
+                <input id="profile-objective-input" type="text" maxlength="120" placeholder="Ex.: Concluir 3 atividades prioritárias" />
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-primary" type="submit" id="profile-save" disabled>Salvar alterações</button>
+                <small class="muted" id="profile-dirty" hidden>Você tem alterações não salvas.</small>
+              </div>
+            </form>
           </div>
         </section>
       </main>
     </div>
+
+    <!-- ===================== MODO FOCO ===================== -->
+    <div id="focus-overlay" class="focus-overlay" role="dialog" aria-modal="true" aria-label="Modo foco" hidden>
+      <button class="icon-btn icon-btn-dark focus-close" type="button" data-action="close-focus" aria-label="Sair do modo foco (Esc)" title="Sair do modo foco (Esc)"><svg class="icon"><use href="#i-close"/></svg></button>
+      <div class="focus-body">
+        <span class="focus-kicker" data-timer-caption>Foco</span>
+        <div class="ring ring-lg" data-timer-ring>
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="ring-track" cx="60" cy="60" r="54"/>
+            <circle class="ring-value" cx="60" cy="60" r="54" data-ring-value/>
+          </svg>
+          <div class="ring-text"><strong data-timer-display>25:00</strong></div>
+        </div>
+        <label class="sr-only" for="focus-task-overlay">Focar em</label>
+        <select id="focus-task-overlay" class="js-focus-task focus-select"></select>
+        <div class="timer-actions">
+          <button class="btn btn-primary btn-lg" type="button" data-action="timer-toggle" data-timer-toggle>Iniciar</button>
+          <button class="btn btn-ghost-dark btn-lg" type="button" data-action="timer-stop" data-timer-stop>Encerrar</button>
+          <button class="btn btn-ghost-dark btn-lg" type="button" data-action="focus-complete-task" id="focus-complete"><svg class="icon"><use href="#i-check"/></svg> Concluir tarefa</button>
+        </div>
+        <small class="focus-hint">Pressione Esc para sair. O tempo continua contando.</small>
+      </div>
+    </div>
+
+    <!-- ===================== NOVA / EDITAR TAREFA ===================== -->
+    <dialog id="task-dialog" class="modal" aria-labelledby="task-dialog-title">
+      <form id="task-form" novalidate>
+        <header class="modal-head">
+          <h2 id="task-dialog-title">Nova tarefa</h2>
+          <button class="icon-btn" type="button" data-action="close-task-dialog" aria-label="Fechar"><svg class="icon"><use href="#i-close"/></svg></button>
+        </header>
+        <div class="field">
+          <label for="task-title">Título</label>
+          <input id="task-title" type="text" maxlength="150" placeholder="O que precisa ser feito?" />
+          <small class="error" data-error-for="task-title"></small>
+        </div>
+        <div class="field">
+          <label for="task-description">Descrição <span class="optional">(opcional)</span></label>
+          <textarea id="task-description" rows="3" maxlength="2000"></textarea>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="task-folder">Pasta</label>
+            <select id="task-folder"></select>
+          </div>
+          <div class="field">
+            <label for="task-due">Prazo <span class="optional">(opcional)</span></label>
+            <input id="task-due" type="date" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="task-priority">Prioridade</label>
+            <select id="task-priority">
+              <option value="baixa">Baixa</option>
+              <option value="media">Média</option>
+              <option value="alta">Alta</option>
+              <option value="urgente">Urgente</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="task-status">Status</label>
+            <select id="task-status">
+              <option value="pendente">A fazer</option>
+              <option value="em-andamento">Em andamento</option>
+              <option value="concluida">Concluída</option>
+            </select>
+          </div>
+        </div>
+        <footer class="modal-actions">
+          <button class="btn btn-ghost" type="button" data-action="close-task-dialog">Cancelar</button>
+          <button class="btn btn-primary" type="submit" id="task-submit">Criar tarefa</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
 
     <script src="./renderer.js"></script>
   </body>
