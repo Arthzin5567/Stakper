@@ -42,8 +42,14 @@ const createWindow = () => {
   // dentro de um processo renderer proprio.
   const win = new BrowserWindow({
     // Tamanho inicial da janela, em pixels.
-    width: 1000,
+    width: 1280,
     height: 800,
+    // Abaixo deste tamanho o layout de colunas deixa de caber.
+    minWidth: 960,
+    minHeight: 640,
+    // Esconde o menu padrao (File, Edit...) e evita um flash branco ao abrir.
+    autoHideMenuBar: true,
+    backgroundColor: '#f5f6fb',
     // webPreferences controla o que a pagina dentro da janela pode fazer.
     // Os padroes do Electron ja sao seguros (contextIsolation ligado e
     // nodeIntegration desligado), entao so mexa aqui se souber o motivo.
