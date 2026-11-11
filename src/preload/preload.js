@@ -70,6 +70,14 @@ contextBridge.exposeInMainWorld('stakper', {
     remover: (payload) => ipcRenderer.invoke('tarefas:remover', payload),
     arquivar: (payload) => ipcRenderer.invoke('tarefas:arquivar', payload)
   },
+  usuarios: {
+    criar: (payload) => ipcRenderer.invoke('usuarios:criar', payload),
+    autenticar: (payload) => ipcRenderer.invoke('usuarios:autenticar', payload),
+    buscar: (payload) => ipcRenderer.invoke('usuarios:buscar', payload),
+    atualizar: (payload) => ipcRenderer.invoke('usuarios:atualizar', payload),
+    alterarSenha: (payload) => ipcRenderer.invoke('usuarios:alterar-senha', payload),
+    desativar: (payload) => ipcRenderer.invoke('usuarios:desativar', payload)
+  },
   calendario: {
     listar: (payload) => ipcRenderer.invoke('calendario:listar', payload),
     criar: (payload) => ipcRenderer.invoke('calendario:criar', payload),
