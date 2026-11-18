@@ -1,3 +1,20 @@
+const rendererUtils = typeof module !== 'undefined' && module.exports
+  ? require('./renderer-utils')
+  : window.StakperUtils
+const timerUtils = typeof module !== 'undefined' && module.exports
+  ? require('./timer-utils')
+  : window.StakperTimerUtils
+
+const {
+  calculateStats,
+  clampFocusMinutes,
+  createTask,
+  getFilteredTasks: filterTasks,
+  validateLogin,
+  validateProfile,
+  validateRegistration
+} = rendererUtils
+
 const tasks = [
   { id: 1, title: 'Revisar capítulo de matemática', status: 'pendente', priority: 'alta', folder: 'universidade', due: '2026-10-22' },
   { id: 2, title: 'Entregar trabalho de história', status: 'em-andamento', priority: 'media', folder: 'universidade', due: '2026-10-24' },
@@ -101,20 +118,18 @@ const renderCalendar = () => {
 }
 
 const renderStats = () => {
-  const pending = tasks.filter((task) => task.status !== 'concluida').length
-  const completed = tasks.filter((task) => task.status === 'concluida').length
-  const focusHours = Math.max(8, 6 + completed)
+  const stats = calculateStats(tasks)
 
   document.querySelectorAll('[data-stat="tasks"]').forEach((node) => {
-    node.textContent = pending
+    node.textContent = stats.pending
   })
 
   document.querySelectorAll('[data-stat="focus"]').forEach((node) => {
-    node.textContent = `${focusHours}h`
+    node.textContent = stats.focus
   })
 
   document.querySelectorAll('[data-stat="study"]').forEach((node) => {
-    node.textContent = `${(focusHours * 0.7).toFixed(1)}h`
+    node.textContent = stats.study
   })
 }
 
@@ -154,16 +169,13 @@ const renderFolderChips = () => {
 }
 
 const getFilteredTasks = () => {
-  const search = document.getElementById('task-search')?.value?.trim().toLowerCase() || state.filters.search
-  const status = document.getElementById('task-status-filter')?.value || state.filters.status
-  const folder = document.getElementById('task-folder-filter')?.value || state.filters.folder
+  const filters = {
+    search: document.getElementById('task-search')?.value || state.filters.search,
+    status: document.getElementById('task-status-filter')?.value || state.filters.status,
+    folder: document.getElementById('task-folder-filter')?.value || state.filters.folder
+  }
 
-  return tasks.filter((task) => {
-    const textMatch = !search || task.title.toLowerCase().includes(search)
-    const statusMatch = status === 'all' || task.status === status
-    const folderMatch = folder === 'all' || task.folder === folder
-    return textMatch && statusMatch && folderMatch
-  })
+  return filterTasks(tasks, filters)
 }
 
 const renderTable = () => {
@@ -226,7 +238,7 @@ const handleLogin = (event) => {
   const email = document.getElementById('login-email')?.value?.trim() || ''
   const password = document.getElementById('login-password')?.value?.trim() || ''
 
-  if (!email || !password) {
+  if (!validateLogin({ email, password })) {
     window.alert('Informe e-mail e senha para entrar.')
     return
   }
@@ -246,7 +258,7 @@ const handleRegister = (event) => {
   const email = document.getElementById('register-email')?.value?.trim() || ''
   const course = document.getElementById('register-course')?.value?.trim() || ''
 
-  if (!name || !email || !course) {
+  if (!validateRegistration({ name, email, course })) {
     window.alert('Preencha nome, e-mail e curso para criar a conta.')
     return
   }
@@ -270,7 +282,7 @@ const handleProfileSave = (event) => {
   const course = document.getElementById('profile-course-input')?.value?.trim() || ''
   const objective = document.getElementById('profile-objective-input')?.value?.trim() || ''
 
-  if (!name || !course || !objective) {
+  if (!validateProfile({ name, course, objective })) {
     window.alert('Preencha todas as informações do perfil.')
     return
   }
@@ -285,16 +297,10 @@ const handleProfileSave = (event) => {
 }
 
 const addTask = (title, folder = 'universidade', priority = 'media') => {
-  if (!title || !title.trim()) return
+  const task = createTask(title, { folder, priority })
+  if (!task) return
 
-  tasks.unshift({
-    id: Date.now(),
-    title: title.trim(),
-    status: 'pendente',
-    priority,
-    folder,
-    due: '2026-10-30'
-  })
+  tasks.unshift(task)
 
   renderTasks()
   renderTable()
@@ -434,9 +440,7 @@ let selectedFocusMinutes = 25
 let isPaused = false
 
 const updateTimer = () => {
-  const minutes = String(Math.floor(remainingSeconds / 60)).padStart(2, '0')
-  const seconds = String(remainingSeconds % 60).padStart(2, '0')
-  if (timerDisplay) timerDisplay.textContent = `${minutes}:${seconds}`
+  if (timerDisplay) timerDisplay.textContent = timerUtils.formatTimer(remainingSeconds)
 }
 
 const stopTimer = () => {
@@ -458,7 +462,7 @@ const toggleTimer = () => {
         return
       }
 
-      remainingSeconds -= 1
+      remainingSeconds = timerUtils.tickTimer(remainingSeconds)
       isPaused = false
       updateTimer()
     }, 1000)
@@ -505,7 +509,7 @@ if (applyFocusButton) {
     const customMinutes = Number(customFocusInput?.value || 25)
     const customBreak = Number(customBreakInput?.value || 5)
 
-    selectedFocusMinutes = Math.min(180, Math.max(10, customMinutes))
+    selectedFocusMinutes = clampFocusMinutes(customMinutes)
     if (customFocusInput) customFocusInput.value = selectedFocusMinutes
     focusOptions.forEach((item) => item.classList.toggle('is-active', Number(item.dataset.focus) === selectedFocusMinutes))
 
